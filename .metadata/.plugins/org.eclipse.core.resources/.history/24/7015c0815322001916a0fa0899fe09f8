@@ -1,0 +1,50 @@
+#include "derivative.h" /* include peripheral declarations */
+
+unsigned char cont=10;
+unsigned char THR;
+
+void OC_intr (void)
+{
+	if (cont>2){	
+		if(dato&1) TXD=1;
+		else TXD=0;
+		OC_referencia+="104";
+		dato>>=1;
+		cont--;
+	}
+	else{
+		if(cont==2){
+			TXD=1;
+			OC_referencia="104";
+			cont--;
+		}
+	}
+	if(cont==0){
+		//desabilitar OC_intr
+		//THRE=1
+	}
+}
+
+void vUART_config (void)
+{
+	//configurar pin TXD, valor inicial=1
+	//configurar timer->base de tiempo: 9600 bps, tb=104bs
+	//configurar output compare
+}
+
+void vUART_send (unsigned char dato)
+{
+	THR=dato;
+	//TXD=0;	//start bit
+	//OC_referencia=timer+"104";
+	//Hab_intr_OC
+	THRE=0;
+	if(dato&1){}		//OC_action=set
+	else OC_action=set
+}
+
+void main (void)
+{
+	vUART_config();
+	vUART_send(0x25);
+}
