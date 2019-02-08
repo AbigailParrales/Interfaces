@@ -1,4 +1,4 @@
 activeuserprofiles=LAPTOP-P586HOEL;Team
 eclipse.preferences.version=1
 org.eclipse.rse.systemtype.local.systemType.defaultUserId=danie
-useridperkey=LAPTOP-P586HOEL.K64F_UART_BS_FLASH_Segger J-Link_Trace Target\=danie;LAPTOP-P586HOEL.K64F_UART_BS_RAM_Segger J-Link_Trace Target\=danie;LAPTOP-P586HOEL.K64F_UART_BS_RAM_Segger J-Link_Trace\=danie;LAPTOP-P586HOEL.K64F_UART_BS_FLASH_Segger J-Link_Trace\=danie;
+useridperkey=LAPTOP-P586HOEL.K64F_UART_BS_RAM_Segger J-Link_Trace Target\=danie;LAPTOP-P586HOEL.K64F_UART_BS_FLASH_Segger J-Link_Trace Target\=danie;LAPTOP-P586HOEL.Local\=danie;LAPTOP-P586HOEL.K64F_UART_BS_RAM_Segger J-Link_Trace\=danie;LAPTOP-P586HOEL.K64F_UART_BS_FLASH_Segger J-Link_Trace\=danie;

@@ -50,7 +50,7 @@ void FTM_init(){
 
 void vUART_config (void)
 {
-	//configurar pin GPIO TXD, valor inicial=1
+	//configurar pin TXD, valor inicial=1
 	//configurar timer->base de tiempo: 9600 bps, tb=104bs
 	//configurar output compare
 }
