@@ -1,10 +1,15 @@
 #include "derivative.h" /* include peripheral declarations */
 
-#define cnt_104 2181
+#define counts_p_bit 2185
+#define baud_rt	9600
+#define sys_clk 32768*640
 
-unsigned char THR;
+unsigned char TxD;
+unsigned char THR;		//El dato adentro de UART
+unsigned char THRE;		//FLAG: Hey, we have data inside!!!
 unsigned char cont;
-unsigned char OC_referencia;
+unsigned char FTM_counts;
+
 
 void FTM_PT_init(){
 	//FTM
@@ -31,6 +36,8 @@ void FTM_init(){
 	duty_cycle= 10486;
 	FTM0_C6V=duty_cycle;*/
 
+	FTM0_C6V=counts_p_bit;
+
 	//Interrupt configuration
 	NVICICER1=(1<<(42%32))+(1<<(58%32));	//NVIC configuration
 	NVICISER1=(1<<(42%32))+(1<<(58%32));	//NVIC configuration
@@ -38,71 +45,122 @@ void FTM_init(){
 	/*We use the desired channel, in this case ch6, you just check in the manual if it is available 
 	 In the microcontroller the port PTA1 its available, and it stands for FTM0_ch6
 	 */
-	FTM0_C6SC=(1<<6)+(5<<2);			//Interruption enable, output compare toggle
+
+	//Interruption enable, output compare set toggle
+	FTM0_C6SC=(1<<6)+(3<<3);			
+	/*
 	//CHIE=1
 	//MSB=0
 	//MSA=1
 	//ELSB=0
 	//ELSA=1
-
-
-} 
+	 * 
+	 */
+}
 
 void vUART_config (void)
 {
-	//configurar pin GPIO TXD, valor inicial=1
+	/*
+	 * GPIOs
+	 * Tx	PTC2		el mismo que para el FTM
+	 * Rx	PTC3
+	 * 
+	 * Port C		SIM_SCGC5		pg. 323
+	 * */
+	//TxD
+	SIM_SCGC5 |= (1<<11);		//clk PORTC
+	PORTC_PCR2 |= (1<<8);		//Mux alt=1	>>	GPIOP
+	GPIOC_PDDR |= (1<<2);		//Output config
+	GPIOC_PDOR |= (1<<1);		//configurar pin GPIO TxD, valor inicial=1
+
+	//RxD
+	PORTC_PCR3 |= (1<<8);		//Mux alt=1	>>	GPIOP
+	GPIOC_PDDR |= (0<<3);		//Output config
+
+
 	//configurar timer->base de tiempo: 9600 bps, tb=104bs
+
 	//configurar output compare
+	FTM_init();
 }
 
 void vUART_send (unsigned char dato)
 {
 	THR=dato;
-	TXD=0;	//start bit
-	OC_referencia=timer+cnt_104;
-	//Hab_intr_OC
-	THRE=0;
-	if(dato&1){}		//OC_action=set
-	else OC_action=set
+	//start bit
+	TxD=0;
+	FTM0_C6V=FTM_counts+counts_p_bit;
+
+	cont=8;
+
+	//Hab_intr_OC para que se manden los 10 bits (start bit + 8data + end bit)	
+	THRE=0;	//Hey, we have data inside!!!
 }
 
-void main (void)
+int main (void)
 {
 	vUART_config();
 	vUART_send(0x25);
+	while(1){
+
+	}
+	return 0;
 }
 
 void FTM0_IRQHandler (void)
 {
-	OC_referencia=FTM0_C6V;
-	if (cont>1)	//data [0-7]
-  {	
-		if(dato&1) TXD=1;
-		else TXD=0;
-    //104 ns = 2181 counts
-		OC_referencia+=cnt_104;
-		dato>>=1;
-		cont--;
-	}
-	else
-  {
-		if(cont==1)	//last data [8]
-    {
-			TXD=1;
-			OC_referencia+=cnt_104;
-			cont--;
-		}
-	}
-	if(cont==0)	//stop bit
-  {
-		//desabilitar OC_intr
-    //Turn off the FTM0_C5 CHF flag
-		/*
+	if((FTM0_C6SC&(1<<7))==(1<<7) && (FTM0_C6SC &(1<<6))==(1<<6))
+	{
+		/* Turn off the FTM0_C5 CHF flag
 		 * Read CSC reg
 		 * Write a 0 in CHF (pos:7)
 		 */
-    (void)FTM0_C6SC;
+		(void)FTM0_C6SC;
 		FTM0_C6SC&=~(1<<7);
-		//THRE=1
+
+		//Read the counts register
+		FTM_counts=FTM0_C6V;
+		if (cont>0)	//data [0-7]
+		{	
+			if(THR&1) 
+				{
+				TxD=1;
+				GPIOC_PDOR |= (1<<1);
+				}
+			else 
+				{
+				TxD=0;
+				GPIOC_PDOR |= (0<<1);
+				}
+			//104 ns = 2181 counts
+			FTM_counts+=counts_p_bit;
+			THR>>=1;
+			cont--;
+		}
+		else
+		{
+			if(cont==0)	//last data [8]
+			{
+				TxD=1;
+				GPIOC_PDOR |= (1<<1);
+				FTM_counts+=counts_p_bit;
+
+				GPIOC_PDOR |= (1<<1);
+			}
+		}
+		if(cont==0)	//stop bit
+		{
+			//desabilitar OC_intr
+			//Turn off the FTM0_C5 CHF flag
+			/*
+			 * Read CSC reg
+			 * Write a 0 in CHF (pos:7)
+			 */
+			(void)FTM0_C6SC;
+			FTM0_C6SC&=~(1<<7);
+			//THRE=1
+		}	
+
 	}
+
 }

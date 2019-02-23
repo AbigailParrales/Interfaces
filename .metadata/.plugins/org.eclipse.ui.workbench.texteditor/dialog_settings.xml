@@ -13,11 +13,24 @@
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="unsigned" key="selection"/>
+		<item value="cont" key="selection"/>
 		<list key="findhistory">
-			<item value="unisgned"/>
+			<item value="cont"/>
+			<item value="THRE"/>
+			<item value="THR"/>
+			<item value="dato"/>
+			<item value="dtao"/>
+			<item value="counts_p_bit"/>
+			<item value="cnt_104"/>
+			<item value="TXD"/>
 		</list>
 		<list key="replacehistory">
+			<item value="flag_THRE"/>
+			<item value="flag_THR"/>
+			<item value="bit_counts"/>
+			<item value="counts_p_bit"/>
+			<item value="TxD"/>
+			<item value="FTM_counts"/>
 			<item value="unsigned"/>
 		</list>
 	</section>
