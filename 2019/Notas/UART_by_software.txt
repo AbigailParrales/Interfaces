@@ -1,3 +1,6 @@
+unsigned char vTHRE = 1;
+unsigned char i=9;
+
 void GPIO_init(void)
 {
 	//prender reloj de interfaz
@@ -26,9 +29,41 @@ void UART_virt_send(unnasigned char dato)
 	do{
 		if (dato&1) TxD=1;
 		else TxD=0;
+		dato>>01;
+		//do{}while(TMRF==0);
+		//apagar TMRF
 	}while(--i);
+	TxD=1;
+	//do{}while(TMRF==0)
+	//apagar TMRF
+	//TMR OFF
+	//vTHRE=1;
 }
 
+void TMR_iSR(void)
+{
+	//apagar TMRF
+	if(i>=2)&&(i<=9)	// de 9 a 2 porque hay un estado mas
+	{
+		if (dato&1) TxD=1;
+		else TxD=0;
+		dato>>01;
+		--i;
+	}
+	else
+	{
+		if (i==1)
+		{
+			TxD=1;
+		}
+		else
+		{
+			//TMR OFF
+			//vTHRE=1;
+		}
+	}
+
+}
 
 void main(void)
 {
