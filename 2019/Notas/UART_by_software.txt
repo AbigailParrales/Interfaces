@@ -1,0 +1,38 @@
+void GPIO_init(void)
+{
+	//prender reloj de interfaz
+	//definir función PIN
+	//FF datos = 1
+	//configuración salida
+}
+
+void TMR_init(void)
+{
+	//Prender reloj de interfaz
+	//Seleccionar fuente TMR, prescaler base de tiempo
+	//Seleccionar preescaler timer
+		//configurar el valor al hasta el que tiene que contar el timer (baud rate) 9600 bps
+	//No activar el timer
+
+}
+
+void UART_virt_send(unnasigned char dato)
+{
+	//do{}while (THRE == 0);
+	//TxD = 0;
+	//TMR ON
+	//do{}while (TMRF == 0);
+	//apagar TMRF
+	do{
+		if (dato&1) TxD=1;
+		else TxD=0;
+	}while(--i);
+}
+
+
+void main(void)
+{
+	GPIO_init();
+	TMR_init();
+	UART_virt_send(0x25);
+}
